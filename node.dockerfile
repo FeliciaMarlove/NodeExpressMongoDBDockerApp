@@ -1,4 +1,7 @@
-# Build: docker build -f node.dockerfile -t nodeapp .
+# . = build context (where the docker file is)
+# When the docker file is called Dockerfile it's not necessary to mention the file name
+# Build: docker build -f node.dockerfile -t image_name .
+# Build: docker build -t registry_name/image_name:1.0 .
 
 # Option 1: Create a custom bridge network and add containers into it
 
@@ -18,20 +21,32 @@
 # docker run -d --name my-mongodb mongo
 # docker run -d -p 3000:3000 --link my-mongodb:mongodb --name nodeapp danwahlin/nodeapp
 
+# /!\ Better to be explicit on the version in a professional environement! Ex node:15.9.0-alpine
 FROM        node:alpine
 
+# Just meta-data (any key)
 LABEL       author="Dan Wahlin"
 
 ARG         PACKAGES=nano
 
+# => NODE_ENV, PORT -> Moved to the docker-compose file
+ENV         NODE_ENV=production
+ENV         PORT=3000
 ENV         TERM xterm
 RUN         apk update && apk add $PACKAGES
 
+# From now on, it's the working directory
+# => we don't have to mention it everytime in the path of files/folers
 WORKDIR     /var/www
 COPY        package*.json ./
 RUN         npm install
 
+# From current (local) folder to working directory
+# Use dockerignore file to avoid copying heavy files like node_modules
 COPY        . ./
+# Reuse port env variable defined at line 31
+#EXPOSE      $PORT
 EXPOSE      3000
 
+# What to run when it starts up
 ENTRYPOINT  ["npm", "start"]
