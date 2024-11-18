@@ -4,7 +4,8 @@
 # Build: docker build -t registry_name/image_name:1.0 .
 
 # Option 1: Create a custom bridge network and add containers into it
-
+# Communication between containers = bridge network
+# There are other solutions for communication between containers, bridge is the easiest
 # docker network create --driver bridge isolated_network
 # docker run -d --net=isolated_network --name mongodb mongo
 
